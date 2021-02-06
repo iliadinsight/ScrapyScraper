@@ -12,6 +12,10 @@ class PostsSpider(scrapy.Spider):
         post_links = response.css('div.post-listing').css('a.hs-featured-image-link::attr(href)').getall()
         yield from response.follow_all(post_links, self.parse_post)
 
+        next_page = response.css('div.blog-pagination').css('a.next-posts-link::attr(href)').get()
+        if next_page is not None:
+            yield response.follow(next_page,callback=self.parse)
+
     def parse_post(self,response):
         yield {
             'url':response.url,
